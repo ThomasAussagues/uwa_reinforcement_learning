@@ -9,8 +9,8 @@
 @Contact :   {thomas.aussagues,lucas.fourest,selman.sezgin}@imt-atlantique.net
 @License :   (C)Copyright 2023, Thomas Aussaguès, Lucas Fourest, Selman Sezgin
 @Desc    :   This script generates total reward and correct action ratio figures according to 
-chapter 2 of Barto and Sutton's book for the k-armed bandit problem with a gaussian rewards 
-ditribution'''
+chapter 2 of Barto and Sutton's book (figure 2.2 p.29) for the k-armed bandit problem with 
+a gaussian rewards distribution'''
 
 import numpy as np
 import matplotlib.pyplot as plt
