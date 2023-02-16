@@ -1,8 +1,7 @@
 {
     "editor.rulers": [
         {
-          "column": 100,    // spacing of 1st column from left
-          "color": "#ff9900"   // orange, Go Vols!
+          "column": 79,    // spacing of 1st column from left
         }
     ]
 }
