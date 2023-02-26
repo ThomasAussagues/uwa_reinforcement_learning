@@ -9,8 +9,8 @@
 @Contact :   {thomas.aussagues,lucas.fourest,selman.sezgin}@imt-atlantique.net
 @License :   (C)Copyright 2023, Thomas Aussaguès, Lucas Fourest, Selman Sezgin
 @Desc    :   This script generates total reward and correct action ratio figures according to 
-chapter 2 of Barto and Sutton's book (figure 2.2 p.29) for the k-armed bandit problem with 
-a gaussian rewards distribution'''
+             chapter 2 of Barto and Sutton's book (figure 2.2 p.29) for the k-armed bandit problem with 
+             a gaussian rewards distribution'''
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ C_N_AGENTS = 2000
 # Number of arms of the bandit problem
 C_N_ARMS = 10
 # Bandit problem mean for the rewards distirbution
-C_MEAN_REWARDS = 0.
+C_MEAN_REWARDS = 4.
 # Bandit problem variance for the rewards distirbution
 C_VARIANCE_REWARDS = 1.
 # Bandit problem variance for the given reward at time t
@@ -105,6 +105,10 @@ ax1.set_xlabel("Time steps")
 ax1.set_ylabel("Total reward")
 ax1.set_title("Total reward of multiple $\epsilon$-greedy policies on a 10-armed testbed")
 ax1.legend()
+ax1.grid()
+plt.savefig("barro_sutton_examples/figures/eps_greedy_rwd.png", dpi = 300)
+
+
 
 # Correct action ratio figure
 fig2, ax2 = plt.subplots()
@@ -114,8 +118,8 @@ ax2.set_xlabel("Time steps")
 ax2.set_ylabel("Ratio of optimal actions")
 ax2.set_title(f"Ratio of optimal actions of multiple $\epsilon$-greedy policies on a {C_N_ARMS}-armed testbed")
 ax2.legend()
-
-plt.show()
+ax2.grid()
+plt.savefig("barro_sutton_examples/figures/eps_greedy_action.png", dpi = 300)
 
 
 
