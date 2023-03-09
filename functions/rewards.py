@@ -15,7 +15,9 @@ import numpy as np
 
 
 def get_reward(tep_values, bitrates,  action):
-    """Return a reward according to the selected action and the data.
+    """Return a reward according to the selected action and the corresponding
+    bitrate. If the packet is transmitted, then the bitrate is returned 
+    as reward, else the reward is 0.
 
     Parameters
     ----------
@@ -29,10 +31,54 @@ def get_reward(tep_values, bitrates,  action):
     Returns
     -------
     reward: float
-        A reward 
+        The reward 
     """
-    if np.random.random() < tep_values[action]:
-        reward = 0  # Non-transmitted packet
-    else:
+    if np.random.random() < tep_values[action] :
+        # Non-transmitted packet
+        reward = 0  
+    else :
+        # Transmitted packet
         reward = bitrates[action]
     return reward 
+
+
+def get_reward_shannon(powers, tep_values, bitrates, snrdB, bandwidthHz,
+                       action):
+    """Return a reward according to the selected action, the corresponding
+    power and bitrate. If the packet is transmitted, then the squared bitrate 
+    divided by the power is returned as reward, else the reward is minus 
+    Shannon's capacity
+
+    Parameters
+    ----------
+    powers: array-like
+        The powers array
+    tep_values: array-like
+        The error rates
+    birates: array-like
+        The birates associated to each action
+    snrdB: float
+        The signal to noise ratio in dB
+    bandwidthHz: float
+        the channel bandwidth in Hz
+    action: int
+        The selected action
+
+    Returns
+    -------
+    reward: float
+        The reward 
+    """
+    if np.random.random() < tep_values[action] :
+        # Non-transmitted packet
+        # Shannon's capacity: 
+        # (Bandwidth in Hz) * log2( 1 + linear SNR) / Relative power
+        # SNR in linear units
+        snr_lin= 10 ** (snrdB / 10)
+        # Reward
+        reward = - bandwidthHz * np.log2(1 + snr_lin) / powers[action]
+
+    else :
+        # Transmitted packet
+        reward = bitrates[action] ** 2 / powers[action]
+    return reward

@@ -12,7 +12,7 @@
 
 
 import numpy as np
-from functions.rewards import get_reward
+from functions.rewards import get_reward, get_reward_shannon
 
 def get_action_ucb(action_values, action_counts, c = 2):
     """Perform action selection according to the Upper 
@@ -179,6 +179,89 @@ def train_ucb_agent_non_stat(per_values, bitrates, n_agents=1000, n_iter=1000, c
             action = get_action_ucb(action_values[n_iter_current, n_agent_current, :], action_counts[n_iter_current, n_agent_current, :], c)
             # Get the corresponding reward
             R = get_reward(per_values[n_iter_current, :], bitrates, action)
+            # Update the action count
+            action_counts[n_iter_current + 1 :, n_agent_current, action] = action_counts[n_iter_current, n_agent_current, action] + 1
+            
+            # If alpha is set to None, the learning-rate is set to
+            # 1 / number of times action a has been chosen between first 
+            # and current iteration
+            if alpha is None :
+                alpha = 1 / action_counts[n_iter_current, n_agent_current, action] 
+
+            # Update of the action-value estimate for the selected action
+            action_values[n_iter_current + 1 : , n_agent_current, action] =\
+                 action_values[n_iter_current, n_agent_current, action] +\
+                    alpha * (R - action_values[n_iter_current, n_agent_current, action])
+
+            # Store the reward
+            rewards[n_iter_current, n_agent_current] = R
+
+    return rewards, action_values, action_counts
+
+def train_ucb_agent_shannon(v_powers, v_snr_db, bandwidth_hz, per_values, v_bitrates, n_agents=1000, n_iter=1000, c=2., alpha = None):
+    """Train agents using incrementally computed sample averages and
+    Upper Confidence Band action selection.
+
+    Parameters
+    ----------
+    v_powers: array-like
+        The powers array
+    v_snr_db : array-like
+        the SNR in dB for each modulation for each iteration
+    bandwidth_hz: float
+        the channel bandwidth in Hz
+    per_values: array-like
+        TEP values of each modulation method
+    v_bitrates: array-like
+        The birates associated to each action
+    n_agent: int, default 1000
+        Number of agents
+    n_iter: int, default 1000
+        Number of time steps
+    eps: float, default 0.05
+        Probability of selecting a non-greedy action instead of the greedy one
+    c: float
+        parameter of the UCB 
+    alpha: float, 
+        Learning rate, if set to None, the sample-average method is used: 
+        the learning rate is set to 1 / number of times action a has been chosen 
+        between first and current iteration
+        
+    Returns
+    -------
+    rewards: array-like
+        rewards for each agent at each iteration
+    action_values: array-like
+        Estimated action values for each agent
+        at each iteration
+    action_counts: array-like
+        Number of action selections for each agent
+        at each iteration
+
+    """
+
+    ## Initialization
+    # Number of actions ie number of modulation methods
+    k = per_values.shape[1] 
+    # Estimated action values for each agent
+    # at each iteration
+    action_values = np.zeros((n_iter, n_agents, k))
+    # Number of action selections for each agent
+    # at each iteration
+    action_counts = np.zeros((n_iter, n_agents, k)) 
+    # Rewards for each agent at each iteration
+    rewards = np.zeros((n_iter, n_agents))
+   
+    ## Learning loop
+    for n_iter_current in range(n_iter) :
+
+        # Iter through every agents
+        for n_agent_current in range(n_agents):
+            
+            # Get next action
+            action = get_action_ucb(action_values[n_iter_current, n_agent_current, :], action_counts[n_iter_current, n_agent_current, :], c)
+            # Get the corresponding reward
+            R = get_reward_shannon(v_powers, per_values[n_iter_current, :], v_bitrates, v_snr_db[n_iter_current] ,bandwidth_hz, action)
             # Update the action count
             action_counts[n_iter_current + 1 :, n_agent_current, action] = action_counts[n_iter_current, n_agent_current, action] + 1
             
