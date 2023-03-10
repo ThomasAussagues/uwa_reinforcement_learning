@@ -82,3 +82,41 @@ def get_reward_shannon(powers, tep_values, bitrates, snrdB, bandwidthHz,
         # Transmitted packet
         reward = bitrates[action] ** 2 / powers[action]
     return reward
+
+def get_expected_reward_shannon(powers, per_values, bitrates, v_snr_db,
+                                bandwidthHz, action):
+    """Return the expected reward according to the selected action, 
+    the corresponding power and bitrate. If the packet is transmitted, 
+    then the squared bitrate divided by the power is returned as reward, 
+    else the reward is minus Shannon's capacity
+
+    Parameters
+    ----------
+    powers: array-like
+        The powers array
+    per_values: array-like
+        The error rates
+    birates: array-like
+        The birates associated to each action
+    v_snr_db: array-like
+        The signal to noise ratio array in dB
+    bandwidthHz: float
+        the channel bandwidth in Hz
+    action: int
+        The selected action
+
+    Returns
+    -------
+    reward: float
+        The reward 
+    """
+
+    # Compute the linear SNR
+    snr_lin = 10 ** (v_snr_db / 10)
+    # Compute the expected reward
+    expected_reward = (1 - per_values[:, action]) \
+        * bitrates[action] ** 2 / powers[action] \
+        - per_values[:, action] * bandwidthHz \
+        * np.log2(1 + snr_lin) / powers[action]
+    
+    return expected_reward
