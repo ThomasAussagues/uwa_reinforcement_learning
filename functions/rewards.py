@@ -35,7 +35,7 @@ def get_reward(tep_values, bitrates,  action):
     """
     if np.random.random() < tep_values[action] :
         # Non-transmitted packet
-        reward = 0  
+        reward = -0.1*bitrates[action] 
     else :
         # Transmitted packet
         reward = bitrates[action]
