@@ -31,7 +31,9 @@ def get_action_epsilon_greedy(Q, eps):
     if np.random.random() <= eps:
         action = np.random.randint(Q.size)
     else:
-        action = np.argmax(Q)
+        winners = np.argwhere(Q == np.amax(Q))
+        np.random.shuffle(winners)
+        action = winners[np.random.randint(0,len(winners))]
     return action
 
 def train_agent_epsilon_greedy(per_values, bitrates, n_agents=1000, n_iter=1000, eps=.05, alpha = None):
